@@ -1,0 +1,22 @@
+spring:
+  config:
+    activate:
+      on-profile: postgres
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/demo_db
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password}
+  flyway:
+    enabled: true
+    url: jdbc:postgresql://localhost:5432/demo_db
+    user: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password}
+springdoc:
+  show-actuator: false
+  swagger-ui:
+    enabled: true
+    path: swagger-ui.html
+
+#app:
+#  kafka:
+#    enabled: true

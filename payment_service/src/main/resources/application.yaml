@@ -1,0 +1,61 @@
+server:
+  port: 8082
+
+#logging:
+#  level:
+#    org.springframework.boot.autoconfigure: DEBUG
+
+spring:
+  datasource:
+    #    url_payment_service: ${URL_PAYMENT_SERVICE:http://localhost:8082/}
+    url: jdbc:postgresql://localhost:5432/demo_db
+    username: postgres
+    password: postgres
+  #  profiles:
+  #    active: postgres
+  application:
+    name: demo
+  main:
+    web-application-type: reactive
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/demo_db
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+  #    url: r2dbc:h2:mem:///demo;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+  #    username: sa
+  #    password:
+
+  flyway:
+    enabled: true
+    url: jdbc:postgresql://localhost:5432/demo_db
+    user: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+  #    enabled: false
+  sql:
+    init:
+      mode: always
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  redis:
+    host: localhost
+    port: 6379
+    connect-timeout: 2000ms
+    timeout: 2000ms
+
+jwt:
+  access-token:
+    secret: ${JWT_ACCESS_SECRET:v3ryS3cr3tK3yF0rHS256Alg0r1thmM1n1mum32Ch4r4ct3rs!}
+    expiration-ms: 900000
+  refresh-token:
+    secret: ${JWT_REFRESH_SECRET:An0th3rS3cr3tK3yF0rRefreshJWTSh0uldB3LongEn0ughT00!}
+    expiration-ms: 604800000
+
+app:
+  kafka:
+    group-id: courier-service-group
+    topics:
+      payment-order: "payment-events"
+      order: "order-events"

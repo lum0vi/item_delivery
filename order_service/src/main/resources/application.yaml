@@ -5,6 +5,14 @@ server:
 #  level:
 #    org.springframework.boot.autoconfigure: DEBUG
 
+springdoc:
+  api-docs:
+    path: /v1/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    disable-with-no-default-url: true
+  packages-to-scan: com.example.demo
+
 spring:
   datasource:
     url_payment_service: ${URL_PAYMENT_SERVICE:http://localhost:8082}

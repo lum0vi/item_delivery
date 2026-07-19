@@ -14,7 +14,7 @@ public class DemoApplication {
 	public static String nameService = "order_service_main" ;
 	public static Random random = new Random();
 
-	// доделать courier сервис с назначением и передачей данных о геолокации курьера и ошибках с ним + jwt с ним
+	// доделать courier сервис с назначением и передачей данных о геолокации курьера и ошибках с ним
 	// сделать чат с курьером и менеджерами
 	// сделать системы платежей и скидок
 	// сделать вход по вк и яндекс

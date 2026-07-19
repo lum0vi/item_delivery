@@ -85,21 +85,30 @@ public class OrderController {
 
     @PostMapping("/assign_courier")
     public Mono<Void> CreateAssignCourier(ServerWebExchange exchange, @RequestBody RequestCreateAssignCourier req){
+        String token = exchange.getRequest().getHeaders().getFirst("Authorization");
         return orderService.getOrder(currentUser(exchange), req.order_id()).flatMap(orderDto -> {
-            OrderDetailsForCourier payload = new OrderDetailsForCourier(
-                    orderDto.id(),
-                    //null, // Заполни payment
-                    orderDto.address(),
-                    orderDto.user(),
-                    (long) (Math.random() * max_rating),
-                    actionAssignCourierCreate
-            );
-            SenderRecord<String, OrderDetailsForCourier, String> record = SenderRecord.create(
-                    new ProducerRecord<>(order_topic_events, String.valueOf(orderDto.id()), payload),
-                    String.valueOf(orderDto.id()) // Ссылка для корреляции (correlation metadata)
-            );
-            return kafkaSender.send(Mono.just(record)).next();
-        }).then();
+            return orderService.getPaymentOrderId(token, orderDto.id()).flatMap(payDto -> {
+                OrderDetailsForCourier payload = new OrderDetailsForCourier(
+                        orderDto.id(),
+                        //null, // Заполни payment
+                        orderDto.address(),
+                        orderDto.user(),
+                        (long) (Math.random() * max_rating),
+                        actionAssignCourierCreate
+                );
+                SenderRecord<String, OrderDetailsForCourier, String> record = SenderRecord.create(
+                        new ProducerRecord<>(order_topic_events, String.valueOf(orderDto.id()), payload),
+                        String.valueOf(orderDto.id()) // Ссылка для корреляции (correlation metadata)
+                );
+                return kafkaSender.send(Mono.just(record)).next();
+            });
+        }).onErrorResume(ResponseStatusException.class, ex -> {
+                    return Mono.error(new ResponseStatusException(
+                            ex.getStatusCode(),
+                            "Не удалось назначить курьера: " + ex.getReason()
+                    ));
+                })
+                .then();
     }
 
 //    @GetMapping("/assign_courier/{id}")

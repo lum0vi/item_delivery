@@ -66,9 +66,14 @@ public class JwtAuthenticationWebFilter implements WebFilter {
     }
 
     private Mono<Void> unauthorized(ServerWebExchange exchange, String message) {
-        byte[] payload = ("{\"message\":\"" + message + "\"}").getBytes(StandardCharsets.UTF_8);
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
         exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
-        return exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(payload)));
+
+        byte[] payload = ("{\"message\":\"" + message + "\"}").getBytes(StandardCharsets.UTF_8);
+        // 💡 Используем DataBufferFactory и передаем через flatMap, чтобы корректно закрыть стрим
+        return exchange.getResponse().writeWith(
+                Mono.fromSupplier(() -> exchange.getResponse().bufferFactory().wrap(payload))
+        );
     }
+
 }

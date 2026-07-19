@@ -161,6 +161,16 @@ public class OrderService {
         ).bodyToMono(PayDto.class);
     }
 
+    public Mono<PayDto> getPaymentOrderId(String token, Long orderid){
+        return paymentServiceClient.get().uri("/controller/pay/order/{id}", orderid).header(HttpHeaders.AUTHORIZATION, token)
+                .retrieve().onStatus(HttpStatusCode::isError, clientResponse ->
+                        Mono.error(new ResponseStatusException(
+                                clientResponse.statusCode(),
+                                "Внешний сервис вернул ошибку"
+                        ))
+                ).bodyToMono(PayDto.class);
+    }
+
     public Mono<List<PayDto>> getPaymentOrder(String token){
         return paymentServiceClient.get().uri("/controller/pay").header("Authorization", token)
                 .retrieve()
